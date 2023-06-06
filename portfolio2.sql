@@ -102,4 +102,30 @@ set SoldAsVacant = case when SoldAsVacant = 'Y' then 'yes'
 	   end
 
 --remove duplicate
+with RowNumCTE as(
+select *,
+	ROW_NUMBER() over (
+	partition by ParcelID,
+				 PropertyAddress,
+				 SalePrice,
+				 SaleDate,
+				 LegalReference
+				 order by
+					UniqueID
+					) row_num
+from Nashvillehousing
+--order by ParcelID
+)
+select * from RowNumCTE
+where row_num >1
+order by PropertyAddress
+
+--delete unused columns
+
+alter table Nashvillehousing
+drop column OwnerAddress, TaxDistrict,PropertyAddress
+
+alter table Nashvillehousing
+drop column SaleDate
+
 
